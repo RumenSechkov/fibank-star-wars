@@ -1,18 +1,22 @@
 import { useNavigate } from 'react-router-dom';
 import DataTable from '../components/DataTable/DataTable';
 import LoadingSpinner from '../components/LoadingSpinner/LoadingSpinner';
+import OfflineModal from '../components/OfflineModal/OfflineModal';
 import { useData } from '../hooks/useData';
+import { useOnlineStatus } from '../hooks/useOnlineStatus';
 import { endSession } from '../utils/auth';
 import styles from './TablePage.module.css';
 
 export default function TablePage() {
   const navigate = useNavigate();
+  const isOnline = useOnlineStatus();
   const {
     status,
     people,
     count,
     page,
     errorMessage,
+    isNetworkError,
     hasNextPage,
     hasPreviousPage,
     goToNextPage,
@@ -44,6 +48,18 @@ export default function TablePage() {
             Try again
           </button>
         </section>
+      )}
+
+      {/*
+        App shows the modal whenever the browser reports it is offline; this
+        covers the other case — a request that died on the network while the
+        browser still believes the connection is up.
+      */}
+      {status === 'error' && isNetworkError && isOnline && (
+        <OfflineModal
+          message='We could not reach the Star Wars API. Check your connection and try again.'
+          onRetry={retry}
+        />
       )}
 
       {status === 'success' && (

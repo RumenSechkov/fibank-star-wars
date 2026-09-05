@@ -5,7 +5,7 @@ const PEOPLE_ENDPOINT = 'https://swapi.py4e.com/api/people/';
 
 type RequestState =
   | { status: 'loading' }
-  | { status: 'error'; message: string }
+  | { status: 'error'; message: string; isNetworkError: boolean }
   | { status: 'success'; data: PeopleResponse };
 
 export interface UseDataResult {
@@ -16,6 +16,8 @@ export interface UseDataResult {
   /** 1-based index of the page currently displayed. */
   page: number;
   errorMessage: string | null;
+  /** True when the request failed because the network was unreachable. */
+  isNetworkError: boolean;
   hasNextPage: boolean;
   hasPreviousPage: boolean;
   goToNextPage: () => void;
@@ -58,6 +60,9 @@ export function useData(): UseDataResult {
             error instanceof Error
               ? error.message
               : 'Something went wrong while loading the characters.',
+          // `fetch` rejects with a TypeError when the request never reached
+          // the server, which is what a dropped connection looks like here.
+          isNetworkError: error instanceof TypeError || !navigator.onLine,
         });
       }
     };
@@ -86,6 +91,7 @@ export function useData(): UseDataResult {
     count: data?.count ?? 0,
     page: readPageNumber(pageUrl),
     errorMessage: state.status === 'error' ? state.message : null,
+    isNetworkError: state.status === 'error' && state.isNetworkError,
     hasNextPage: nextPageUrl !== null,
     hasPreviousPage: previousPageUrl !== null,
     goToNextPage,

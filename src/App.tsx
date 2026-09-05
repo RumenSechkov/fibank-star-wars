@@ -1,5 +1,7 @@
 import type { ReactElement } from 'react';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+import OfflineModal from './components/OfflineModal/OfflineModal';
+import { useOnlineStatus } from './hooks/useOnlineStatus';
 import LoginPage from './pages/LoginPage';
 import TablePage from './pages/TablePage';
 import { isAuthenticated } from './utils/auth';
@@ -10,6 +12,8 @@ function ProtectedRoute({ children }: { children: ReactElement }) {
 }
 
 export default function App() {
+  const isOnline = useOnlineStatus();
+
   return (
     <BrowserRouter>
       <Routes>
@@ -24,6 +28,7 @@ export default function App() {
         />
         <Route path='*' element={<Navigate to='/' replace />} />
       </Routes>
+      {!isOnline && <OfflineModal />}
     </BrowserRouter>
   );
 }
