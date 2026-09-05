@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { ChangeEvent, FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
+import LoadingSpinner from '../LoadingSpinner/LoadingSpinner';
 import { startSession } from '../../utils/auth';
 import {
   MAX_CREDENTIAL_LENGTH,
@@ -10,6 +11,9 @@ import {
 import styles from './LoginForm.module.css';
 
 const HELPER_TEXT = `Between ${MIN_CREDENTIAL_LENGTH} and ${MAX_CREDENTIAL_LENGTH} characters.`;
+
+/** How long the redirect spinner stays up before the table page takes over. */
+const REDIRECT_DELAY_MS = 500;
 
 interface CredentialFieldProps {
   id: 'username' | 'password';
@@ -70,6 +74,7 @@ export default function LoginForm() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [touched, setTouched] = useState({ username: false, password: false });
+  const [isRedirecting, setIsRedirecting] = useState(false);
 
   const usernameError = validateCredential(username);
   const passwordError = validateCredential(password);
@@ -80,10 +85,20 @@ export default function LoginForm() {
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!isValid) return;
+    if (!isValid || isRedirecting) return;
     startSession();
-    navigate('/table');
+    setIsRedirecting(true);
   };
+
+  useEffect(() => {
+    if (!isRedirecting) return;
+    const timer = window.setTimeout(() => navigate('/table', { replace: true }), REDIRECT_DELAY_MS);
+    return () => window.clearTimeout(timer);
+  }, [isRedirecting, navigate]);
+
+  if (isRedirecting) {
+    return <LoadingSpinner label='Signing you in…' />;
+  }
 
   return (
     <form className={styles.form} onSubmit={handleSubmit} noValidate>
