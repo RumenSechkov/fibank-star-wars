@@ -62,7 +62,11 @@ function CredentialField({
         onChange={handleChange}
         onBlur={onBlur}
       />
-      <p id={helperId} className={showError ? `${styles.helper} ${styles.helperError}` : styles.helper}>
+      <p
+        id={helperId}
+        className={showError ? `${styles.helper} ${styles.helperError}` : styles.helper}
+        aria-live='polite'
+      >
         {showError ? error : HELPER_TEXT}
       </p>
     </div>

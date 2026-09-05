@@ -51,6 +51,7 @@
 }
 
 .submitButton {
+  min-height: 2.75rem;
   padding: 0.625rem 1rem;
   border: none;
   border-radius: 0.375rem;
@@ -65,7 +66,7 @@
 }
 
 .submitButton:disabled {
-  background: #cbd5e1;
-  color: #f8fafc;
+  background: #e2e8f0;
+  color: #475569;
   cursor: not-allowed;
 }
