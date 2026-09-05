@@ -1,20 +1,16 @@
-import { useNavigate } from 'react-router-dom';
-import { startSession } from '../utils/auth';
+import LoginForm from '../components/LoginForm/LoginForm';
+import styles from './LoginPage.module.css';
 
 export default function LoginPage() {
-  const navigate = useNavigate();
-
-  const handleLogin = () => {
-    startSession();
-    navigate('/table', { replace: true });
-  };
-
   return (
-    <main>
-      <h1>Sign in</h1>
-      <button type='button' onClick={handleLogin}>
-        Login
-      </button>
+    <main className={styles.page}>
+      <section className={styles.card}>
+        <h1 className={styles.title}>Sign in</h1>
+        <p className={styles.subtitle}>
+          Enter your credentials to browse the Star Wars character directory.
+        </p>
+        <LoginForm />
+      </section>
     </main>
   );
 }
